@@ -1,4 +1,5 @@
 import numpy as np
+import random
 
 def getKNearestNeighbors(x,X,K=1):  
     """
@@ -8,8 +9,13 @@ def getKNearestNeighbors(x,X,K=1):
     :param K: number of nearest-neighbors to be returned
     :return: return list of K row indexes referring to the K nearest neighbors of x in X
     """
-    d=[]                          # !!REPLACE!! compute list of Euklidean distances between x and X[i]
-    return np.array(K*[0],'int')  # !!REPLACE!! return indexes of k smallest distances     
+    #d=[]
+    #for i in range(0,len(X)):
+       # d.append(np.linalg.norm(X[i]-x))
+    d = np.linalg.norm(X - x, axis=1)                   # !!REPLACE!! compute list of Euklidean distances between x and X[i]
+    index_smallest_distances = np.argsort(d) #axis=1 berechnet eukl. länge zeilenweise, np.argsort gibt die Indizes der aufsteigend sortierten Liste zurück
+   # print("SM:",index_smallest_distances)                 
+    return index_smallest_distances[0:K]  # !!REPLACE!! return indexes of k smallest distances     
 
 def getClassProbabilities(t,C):     
     """
@@ -19,8 +25,9 @@ def getClassProbabilities(t,C):
     :return P: P is list of class probabilities (length C) 
     """
     assert min(t)>=0 and max(t)<C, "t must be list of integer labels between 0 and C-1"
-    P=np.zeros(C)   # allocate array for class probabilities (length = number of classes)
-    P[:]=1.0/C      # !!REPLACE!! P[c] should be the probability for class c=0,1,2,...,C-1 for the label list t
+    P=np.zeros(C)   # allocate array for class probabilities (length = number of classes) da matrix mit 0en, stellt sicher, dass wenn eine klasse nicht vorhanden ist, die wahrscheinlichkeiten dennoch richtig zugeordnet werden und 0 sind
+    classes, freq = np.unique(t, return_counts=True) #ermittelt vorkommende klassen und deren häufigkeit. 
+    P[classes] = freq/len(t)     # !!REPLACE!! P[c] should be the probability for class c=0,1,2,...,C-1 for the label list t
     return P        # return class distribution
 
 def classify(P): 
@@ -30,9 +37,13 @@ def classify(P):
     :param P: array of class probabilities (length = number of classes), e.g., computed by getClassProbabilities(.)
     :return c: class decision (index of the most probable class)
     """
-    idx_maxP=[0]              # !!REPLACE!! get list of most likely classes (having maximum probability)
-    if len(idx_maxP)>1: c=0   # !!REPLACE!! if more than one maximum class then choose at random
-    else: c=0                 # !!REPLACE!! else choose unique class having maximal probability
+    maxP = np.max(P)
+    idx_maxP= np.where(P == maxP )[0]            # !!REPLACE!! get list of most likely classes (having maximum probability)
+            #where gibt tuple zurück, aber wir brauchen nur den ersten wert, also den index und nicht den wert an dieser stelle
+    if len(idx_maxP)>1: 
+        zufallsindex = random.randint(0,len(idx_maxP)-1)
+        c=idx_maxP[zufallsindex]  # !!REPLACE!! if more than one maximum class then choose at random
+    else: c=idx_maxP[0]                 # !!REPLACE!! else choose unique class having maximal probability
     return c                  # return class decision (between 0 and C-1, i.e., index in P)
 
 # *****************************************************************************
@@ -67,3 +78,4 @@ if __name__ == '__main__':
         
     print("Class distribution P=",P)
     print("Most likely class: c=",c," with P(c)=",P[c])
+    
