@@ -93,7 +93,7 @@ class Sim(iv.IVisit_Simulation):
             w=display.getWidget("Data Vectors")
             self.datvec_canvas=display.bind2Widget("Data Vectors","<Button-1>",self.onPressedB1_datvec,"imgcanvas")   # bind mouse clicks on image to function 
             self.display=display     # store reference to display for later manipulations etc.
-
+            
     def onPressedB1_datvec(self,event):
         d = SimData          # short hand to simulation data arrays
         x,y=event.x,event.y  # clicked position (in pixel coordinates)
@@ -119,13 +119,14 @@ class Sim(iv.IVisit_Simulation):
         T = np.concatenate((T1,T2))
 
         # (ii) find nearest neighbor for input x
-        idx_KNN = [0]                                        # !!REPLACE!! get indexes of K nearest neighbors
+        idx_KNN = getKNearestNeighbors(self.x, X,p.K)                # !!REPLACE!! get indexes of K nearest neighbors p.K, da p die Simulationsparameter beinhaltet
         X_KNN = X[idx_KNN]                                   # nearest neighbor vectors
         T_KNN = T[idx_KNN]                                   # nearest neighbor class labels
         r_KNN = np.linalg.norm(X_KNN[-1]-self.x)             # largest Euklidean distance defines radius of sphere containing all K nearest neighbors
 
         # (iii) do classification
-        P=[0.5, 0.5]                                         # !!REPLACE!! get class probabilities; subtract 1 from T_KNN to get class labels 0,1 (instead of 1,2) as required
+        C = 2 #Anzahl der Klassen, Wurde hinzugefügt
+        P=getClassProbabilities(T_KNN-1, C)               # !!REPLACE!! get class probabilities; subtract 1 from T_KNN to get class labels 0,1 (instead of 1,2) as required
         c=classify(P)+1                                      # select class decision (add 1 to have again class labels 1,2 instead of 0,1)
 
         # (iv) write results
