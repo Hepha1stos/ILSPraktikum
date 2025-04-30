@@ -64,16 +64,16 @@ class SimParameters(iv.IVisit_Parameters):
     K    = 1            # number of nearest neighbors (for KNN-classification)
     S    = 2            # number data partitions for cross validation 
     str_classifiers='100'             # selected classifiers (KNN/FastKNN/KernelMLP)
-    par_GaussData1={'N':75,           # number of data points
-                    'mu_1':-1.0,      # expectation (component 1)
+    par_GaussData1={'N':75 ,           # number of data points
+                    'mu_1':-1.0,       # expectation (component 1)
                     'mu_2':2.0,       # expectation (component 2)
                     'Sigma_11':2.0,   # variance (component 1)
                     'Sigma_22':3.0,   # variance (component 2)
                     'Sigma_12':0.5    # covariance (between components 1 and 2)
     }
-    par_GaussData2={'N':100,          # number of data points
+    par_GaussData2={'N':100,            # number of data points
                     'mu_1':2.0,       # expectation (component 1)
-                    'mu_2':-1.0,      # expectation (component 2)
+                    'mu_2':-1.0,       # expectation (component 2)
                     'Sigma_11':2.0,   # variance (component 1)
                     'Sigma_22':1.0,   # variance (component 2)
                     'Sigma_12':0.5    # covariance (between components 1 and 2)
