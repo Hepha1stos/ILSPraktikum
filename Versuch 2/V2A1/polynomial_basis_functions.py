@@ -15,24 +15,31 @@ def get_phi_polyD2(m):   # return list of 2D polynomial basis functions phi_j(x0
     return lambda x: np.array([phi_j(x) for phi_j in phi])   # return function generating feature vector phi(x) for input x 
 
 def get_phi_polyD3(m):   # return list of 3D polynomial basis functions phi_j(x0,x1,x2) of degree m
-    phi = [lambda x: x[0]+x[1]+x[2]]   # !!! REPLACE THIS !!!  --> use similar code as in get_phi_polyD2(m), but for 3D inputs!!
-    return lambda x: np.array([phi_j(x) for phi_j in phi])   # return function generating feature vector phi(x) for input x 
+    phi = []
+    for n in range(m+1):            # loop over total degree n=0,1,2,...,m
+        for n0 in range(n+1):       
+            for n1 in range(n - n0 + 1):
+                n2 = n - n0 - n1
+                phi += [lambda x, n0=n0, n1=n1, n2=n2: x[0]**n0 * x[1]**n1 * x[2]**n2]  # x0^n0 * x1^n1 * x2^n2
+    return lambda x: np.array([phi_j(x) for phi_j in phi])   # return function generating feature vector phi(x) 
 
 def get_phi_poly(d,m):   # return list of all polynomial basis functions for input dimensionality d and polynomial degree m
-    phi = []                                                     # init list of basis functions
-    list_ni=[]                                                   # !!! REPLACE THIS !!!  --> generate all tuples (n1,...,nd) with n1+...+nd<=m using Cartesian product
-    list_ni_sum=np.array([np.sum(ni) for ni in list_ni],'int')   # list of sums of the tuples (n1,...,nd); just to produce correct order
-    idx_list=np.array(range(len(list_ni_sum)))                   # just a list [0,1,2,...,len(list_ni_sum)-1] for later selection of subsets
-    for n in range(m+1):                      # loop over total degree n=0,1,2,...,m
-        idx_list_n=idx_list[list_ni_sum==n]   # get indexes for all tuples (n1,...,nd) with sum = n
+    phi = []  # init list of basis functions
+    list_ni = [ni for ni in itertools.product(range(m+1), repeat=d) if sum(ni) <= m]  # alle Tupel (n1,...,nd) mit sum <= m
+    list_ni_sum = np.array([np.sum(ni) for ni in list_ni], 'int')
+    idx_list = np.array(range(len(list_ni_sum)))
+
+    for n in range(m+1):
+        idx_list_n = idx_list[list_ni_sum == n]
         for i in idx_list_n:
-            ni=list_ni[i]                     # one tuple (n1,...,nd) of the Cartesian product with sum=n
-            phi += [lambda x: x[0]]           # !!! REPLACE THIS !!!  --> add basis function x1^n1*n2^n2*...*xd^nd corresponding to tuple ni=(n1,...,nd) to list
-    return lambda x: np.array([phi_j(x) for phi_j in phi])   # return function generating feature vector phi(x) for input x 
+            ni = list_ni[i]
+            phi += [lambda x, ni=ni: np.prod([x[j]**ni[j] for j in range(d)])]  # Basisfunktion x1^n1 * x2^n2 * ... * xd^nd
+    return lambda x: np.array([phi_j(x) for phi_j in phi])   # return function generating feature vector phi(x)
 
 
-def evaluate_linear_model(W,phi,x):  # return linear model function y=w.T*phi(x) or y=W*phi(x); works for both cases
-    y=0                              # !!! REPLACE THIS !!!
+def evaluate_linear_model(W, phi, x):  # return linear model function y=w.T*phi(x) or y=W*phi(x)
+    phi_x = phi(x)
+    y = W @ phi_x  # Matrix-Vektor-Produkt
     return y
 
 
