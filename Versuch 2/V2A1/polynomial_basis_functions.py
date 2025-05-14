@@ -75,3 +75,14 @@ if __name__ == '__main__':
     x=[1,2,3,4]              # input vector
     print("y=w.T*phi(x)=",evaluate_linear_model(w,phi_poly4D_,x))
     print("y=W*phi(x)=",evaluate_linear_model(W,phi_poly4D_,x))
+
+
+
+    p1 = get_phi_poly(1,4)
+    p2 = get_phi_poly(2,3)
+    p3 = get_phi_poly(3,2)
+    p4 = get_phi_poly(4,3)
+    print("p1: ", p1([2]))
+    print("p2: ", p2([1,2]))
+    print("p3: ", p3([1,2,3]))
+    print("p4: ", p4([1,2,3,4]))
